@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kuis Alfabet</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom, #a2d2ff, #ffc8dd);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #ff006e;
+      font-size: 40px;
+    }
+
+    h2 {
+      color: #ff006e;
+    }
+
+    p {
+      font-size: 20px;
+    }
+
+    button {
+      font-size: 24px;
+      padding: 15px 25px;
+      margin: 10px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+      background: #9bf6ff;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      opacity: 0.9;
+    }
+
+    #kuis, #penutup {
+      display: none; /* disembunyikan dulu */
+    }
+
+    #hasil {
+      font-size: 28px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    #skor {
+      font-size: 22px;
+      margin-top: 10px;
+    }
+
+    img {
+      max-width: 180px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 🔹 Layar Home -->
+  <div id="home">
+    <img src="https://cdn-icons-png.flaticon.com/512/201/201818.png" alt="ikon anak-anak">
+    <h1>🎉 Selamat Datang di Kuis Alfabet 🎉</h1>
+    <p>Belajar huruf A-Z dengan cara seru!<br>Tekan tombol di bawah untuk memulai 🚀</p>
+    <button onclick="mulaiKuis()">▶ Mulai Kuis</button>
+  </div>
+
+  <!-- 🔹 Layar Kuis -->
+  <div id="kuis">
+    <h2>Kuis Alfabet (5 Soal)</h2>
+    <p>Klik tombol suara, lalu pilih huruf yang benar!</p>
+
+    <button onclick="putarSuara()">🔊 Putar Suara</button>
+    <div id="pilihan"></div>
+
+    <p id="hasil"></p>
+    <p id="skor"></p>
+  </div>
+
+  <!-- 🔹 Layar Penutup -->
+  <div id="penutup"></div>
+
+  <script>
+    let soalKe = 1;
+    let totalSoal = 5;
+    let skor = 0;
+    let jawabanBenar = "";
+
+    // 🔹 tampilkan kuis setelah klik "Mulai"
+    function mulaiKuis() {
+      document.getElementById("home").style.display = "none";
+      document.getElementById("kuis").style.display = "block";
+      buatSoal();
+    }
+
+    // fungsi random huruf
+    function hurufRandom() {
+      let kode = 65 + Math.floor(Math.random() * 26);
+      return String.fromCharCode(kode);
+    }
+
+    // buat soal
+    function buatSoal() {
+      if (soalKe > totalSoal) {
+        document.getElementById("kuis").style.display = "none";
+        document.getElementById("penutup").style.display = "block";
+        document.getElementById("penutup").innerHTML = `
+          <h2>🎉 Kuis Selesai! 🎉</h2>
+          <p>Skor akhir kamu: <b>${skor}/${totalSoal}</b></p>
+          <img src="https://cdn-icons-png.flaticon.com/512/2278/2278992.png" alt="hadiah">
+          <br>
+          <button onclick="ulangKuis()">🔄 Ulangi Kuis</button>
+        `;
+        return;
+      }
+
+      jawabanBenar = hurufRandom();
+      document.getElementById("hasil").innerHTML = "Soal " + soalKe + " dari " + totalSoal;
+
+      let pilihan = [jawabanBenar];
+      while (pilihan.length < 3) {
+        let huruf = hurufRandom();
+        if (!pilihan.includes(huruf)) {
+          pilihan.push(huruf);
+        }
+      }
+      pilihan.sort(() => Math.random() - 0.5);
+
+      let html = "";
+      pilihan.forEach(h => {
+        html += `<button onclick="cekJawaban('${h}')">${h}</button> `;
+      });
+      document.getElementById("pilihan").innerHTML = html;
+      document.getElementById("skor").innerHTML = "Skor sementara: " + skor;
+    }
+
+    // suara
+    function putarSuara() {
+      let suara = new SpeechSynthesisUtterance(jawabanBenar);
+      suara.lang = "en-US";
+      window.speechSynthesis.speak(suara);
+    }
+
+    // cek jawaban
+    function cekJawaban(pilihan) {
+      if (pilihan === jawabanBenar) {
+        document.getElementById("hasil").innerHTML = "✅ Benar!";
+        skor++;
+      } else {
+        document.getElementById("hasil").innerHTML = "❌ Salah! Jawaban: " + jawabanBenar;
+      }
+      soalKe++;
+      setTimeout(buatSoal, 1000);
+    }
+
+    // ulang kuis
+    function ulangKuis() {
+      soalKe = 1;
+      skor = 0;
+      document.getElementById("penutup").style.display = "none";
+      document.getElementById("kuis").style.display = "block";
+      buatSoal();
+    }
+  </script>
+</body>
+</html>
